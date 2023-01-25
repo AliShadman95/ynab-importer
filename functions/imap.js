@@ -2,6 +2,7 @@ import Imap from 'imap';
 import imap from '../core/imap.js';
 import categorize from '../utils/payeeHandler.js';
 import postTransaction from './ynab.js';
+import config from '../credentials.js';
 
 function openInbox(cb) {
   imap.openBox('INBOX', true, cb);
@@ -15,8 +16,8 @@ const runImap = () => {
         console.log('New mail received');
         let body = '';
         let headers = '';
-        const fromMail = 'comunicazioni@intesasanpaolo.com';
-        const ccValue = '5398_*_*_7143';
+        const fromMail = config.from_mail;
+        const ccValue = config.cc;
 
         var f = imap.seq.fetch(box.messages.total + ':*', {
           bodies: ['HEADER.FIELDS (FROM TO SUBJECT)', 'TEXT'],
