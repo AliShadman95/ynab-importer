@@ -15,7 +15,7 @@ const runImap = () => {
         console.log('New mail received');
         let body = '';
         let headers = '';
-        const fromMail = 'alishadman955@gmail.com';
+        const fromMail = 'comunicazioni@intesasanpaolo.com';
         const ccValue = '5398_*_*_7143';
 
         var f = imap.seq.fetch(box.messages.total + ':*', {
