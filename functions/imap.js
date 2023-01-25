@@ -44,11 +44,10 @@ const runImap = () => {
           });
 
           msg.once('end', async function () {
-            console.log(
-              `Finito, faccio i controlli..., il mittente è : ${headers?.from[0]}`,
-            );
-
             if (headers && headers?.from[0]?.toLowerCase().includes(fromMail)) {
+              console.log(
+                `Trovata una mail con il mittente: ${headers?.from[0]}`,
+              );
               const isCC = body.includes(ccValue);
 
               const price = body
@@ -72,7 +71,6 @@ const runImap = () => {
           console.log('Fetch error: ' + err);
         });
         f.once('end', function () {
-          console.log('Done fetching all messages!');
           imap.end();
         });
       });
@@ -83,9 +81,7 @@ const runImap = () => {
     console.log(err);
   });
 
-  imap.once('end', function () {
-    console.log('Connection ended');
-  });
+  imap.once('end', function () {});
 
   imap.connect();
 };
