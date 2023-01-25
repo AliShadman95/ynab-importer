@@ -45,7 +45,13 @@ const runImap = () => {
           });
 
           msg.once('end', async function () {
-            if (headers && headers?.from[0]?.toLowerCase().includes(fromMail)) {
+            console.log(headers);
+
+            if (
+              headers &&
+              headers?.from[0]?.toLowerCase().includes(fromMail) &&
+              headers?.subject[0]?.toLowerCase().includes('pagamento')
+            ) {
               console.log(
                 `Trovata una mail con il mittente: ${headers?.from[0]}`,
               );
