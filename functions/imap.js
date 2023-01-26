@@ -2,10 +2,9 @@ import Imap from 'imap';
 import imap from '../core/imap.js';
 import categorize from '../utils/payeeHandler.js';
 import postTransaction from './ynab.js';
-import config from '../credentials.js';
 
 function openInbox(cb) {
-  imap.openBox('INBOX', true, cb);
+  imap.openBox(process.env.INBOX, true, cb);
 }
 const runImap = () => {
   imap.once('ready', function () {
@@ -16,8 +15,8 @@ const runImap = () => {
         console.log('New mail received');
         let body = '';
         let headers = '';
-        const fromMail = config.from_mail;
-        const ccValue = config.cc;
+        const fromMail = process.env.FROM_MAIL;
+        const ccValue = process.env.CC;
 
         var f = imap.seq.fetch(box.messages.total + ':*', {
           bodies: ['HEADER.FIELDS (FROM TO SUBJECT)', 'TEXT'],
@@ -78,7 +77,7 @@ const runImap = () => {
           console.log('Fetch error: ' + err);
         });
         f.once('end', function () {
-          imap.end();
+          /*   imap.end(); */
         });
       });
     });

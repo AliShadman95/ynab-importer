@@ -1,9 +1,8 @@
 import Imap from 'imap';
-import config from '../credentials.js';
 
 const imap = new Imap({
   user: 'alishadman955@gmail.com',
-  password: config.gmail_pass,
+  password: process.env.GMAIL_TOKEN,
   host: 'imap.gmail.com',
   port: 993,
   tls: true,

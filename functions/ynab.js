@@ -1,7 +1,6 @@
 import ynab, { utils } from 'ynab';
-import config from '../credentials.js';
 
-const ynabAPI = new ynab.API(config.ynab_token);
+const ynabAPI = new ynab.API(process.env.YNAB_TOKEN);
 
 const postTransaction = async (isCC, price, categorizedPayee) => {
   const {

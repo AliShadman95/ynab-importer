@@ -23,9 +23,11 @@ const categorize = (payee) => {
   if (notValid.some((word) => payee.toLowerCase().includes(word))) {
     return false;
   }
-
+  if (payee.toLowerCase().includes('farmacia')) {
+    return { payee_name: 'Medicine', category: 'salute/medico' };
+  }
   if (payee.toLowerCase().includes('atac')) {
-    return { payee_name: 'Atac', category: 'trasporto' };
+    return { payee_name: 'Atac', category: 'trasporti' };
   }
   if (amazon.some((word) => payee.toLowerCase().includes(word))) {
     return { payee_name: 'Amazon', category: 'amazon' };
@@ -39,6 +41,7 @@ const categorize = (payee) => {
   if (supermercati.some((word) => payee.toLowerCase().includes(word))) {
     return { payee_name: 'Ristorante', category: 'spesa' };
   }
+
   if (payee.toLowerCase().includes('paypal')) {
     return { payee_name: 'Paypal', category: 'spese generiche' };
   }
