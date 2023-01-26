@@ -7,6 +7,8 @@ function openInbox(cb) {
   imap.openBox(process.env.INBOX, true, cb);
 }
 const runImap = () => {
+  console.log('Ready to receive emails!!!');
+
   imap.once('ready', function () {
     openInbox(function (err, box) {
       if (err) throw err;
