@@ -59,9 +59,11 @@ const runImap = () => {
               const isCC = body.includes(ccValue);
 
               const price = body
-                .split(' EUR')[0]
+                .split(isCC ? ' EUR' : ' con la')[0]
                 .split(' ')
-                [body.split(' EUR')[0].split(' ').length - 1].replace('=', '')
+                [
+                  body.split(isCC ? ' EUR' : ' con la')[0].split(' ').length - 1
+                ].replace('=', '')
                 .replace(/\s/g, '');
 
               const payee = body.split('presso')[1].split('.')[0];
