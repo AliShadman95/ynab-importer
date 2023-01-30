@@ -39,7 +39,7 @@ const categorize = (payee) => {
     return { payee_name: 'Asporto', category: 'mangiare fuori/asporto' };
   }
   if (supermercati.some((word) => payee.toLowerCase().includes(word))) {
-    return { payee_name: 'Ristorante', category: 'spesa' };
+    return { payee_name: 'Supermercati', category: 'spesa' };
   }
 
   if (payee.toLowerCase().includes('paypal')) {

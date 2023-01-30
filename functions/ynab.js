@@ -17,9 +17,13 @@ const postTransaction = async (isCC, price, categorizedPayee) => {
     ),
   );
 
+  const parsedPrice = isCC
+    ? parseFloat(price.replace(/,/g, '.')) * 1000
+    : Math.ceil(parseFloat(price.replace(/,/g, '.'))) * 1000;
+
   await ynabAPI.transactions.createTransaction('last-used', {
     transaction: {
-      amount: -Math.abs(parseFloat(price.replace(/,/g, '.')) * 1000),
+      amount: -Math.abs(parsedPrice),
       payee_name: categorizedPayee.payee_name,
       category_id: correctCategory.categories.find((c) =>
         c.name.toLowerCase().includes(categorizedPayee.category),
