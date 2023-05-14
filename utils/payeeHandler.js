@@ -8,6 +8,7 @@ const categorize = (payee) => {
     'lidl',
     'eurospin',
     'getir',
+    'crf',
   ];
   const ristoranti = ['ristorante', 'la piadineria', "mcdonald's"];
   const notValid = [
