@@ -3,6 +3,76 @@ import imap from '../core/imap.js';
 import categorize from '../utils/payeeHandler.js';
 import postTransaction from './ynab.js';
 
+async function checkIntesa(headers, body) {
+  const fromMail = process.env.FROM_MAIL;
+  const ccValue = process.env.CC;
+
+  if (
+    !headers ||
+    !headers?.from[0]?.toLowerCase().includes(fromMail) ||
+    !headers?.subject[0]?.toLowerCase().includes('pagamento')
+  ) {
+    return;
+  }
+
+  console.log(`Trovata una mail con il mittente: ${headers?.from[0]}`);
+  const isCC = body.includes(ccValue);
+
+  const price = body
+    .split(isCC ? ' EUR' : ' con la')[0]
+    .split(' ')
+    [body.split(isCC ? ' EUR' : ' con la')[0].split(' ').length - 1].replace(
+      '=',
+      '',
+    )
+    .replace(/\s/g, '');
+
+  const payee = body.split('presso')[1].split('.')[0];
+  const categorizedPayee = categorize(payee);
+
+  console.log(`Email con pagamento ricevuto, il prezzo è ${price}`);
+
+  if (categorizedPayee) {
+    await postTransaction(
+      isCC ? 'mastercard' : 'intesa',
+      price,
+      categorizedPayee,
+    );
+  }
+}
+
+async function checkAmex(headers, body) {
+  const fromMailAmex = process.env.FROM_MAIL_AMEX;
+
+  if (
+    !headers ||
+    !headers?.from[0]?.toLowerCase().includes(fromMailAmex) ||
+    !headers?.subject[0]?.toLowerCase().includes('conferma operazione')
+  ) {
+    return;
+  }
+
+  console.log(`Trovata una mail con il mittente: ${headers?.from[0]}`);
+
+  // Regular expression to capture the operation details, the import number and the currency
+  const regex = /\d{2}\/\d{2}\/\d{4}\s*([^\n]+)\s*(\d+,\d+)\s*([A-Za-z]+)/;
+
+  const match = body.match(regex);
+
+  if (match) {
+    const operationDetails = match[1].trim();
+    const importNumber = match[2];
+
+    const categorizedPayee = categorize(operationDetails);
+
+    if (categorizedPayee) {
+      await postTransaction('amex', importNumber, categorizedPayee);
+    }
+  } else {
+    console.log('Match not found in the text.');
+  }
+}
+
 function openInbox(cb) {
   imap.openBox(process.env.INBOX, true, cb);
 }
@@ -17,8 +87,6 @@ const runImap = () => {
         console.log('New mail received');
         let body = '';
         let headers = '';
-        const fromMail = process.env.FROM_MAIL;
-        const ccValue = process.env.CC;
 
         var f = imap.seq.fetch(box.messages.total + ':*', {
           bodies: ['HEADER.FIELDS (FROM TO SUBJECT)', 'TEXT'],
@@ -48,33 +116,8 @@ const runImap = () => {
           msg.once('end', async function () {
             console.log(headers);
 
-            if (
-              headers &&
-              headers?.from[0]?.toLowerCase().includes(fromMail) &&
-              headers?.subject[0]?.toLowerCase().includes('pagamento')
-            ) {
-              console.log(
-                `Trovata una mail con il mittente: ${headers?.from[0]}`,
-              );
-              const isCC = body.includes(ccValue);
-
-              const price = body
-                .split(isCC ? ' EUR' : ' con la')[0]
-                .split(' ')
-                [
-                  body.split(isCC ? ' EUR' : ' con la')[0].split(' ').length - 1
-                ].replace('=', '')
-                .replace(/\s/g, '');
-
-              const payee = body.split('presso')[1].split('.')[0];
-              const categorizedPayee = categorize(payee);
-
-              console.log(`Email con pagamento ricevuto, il prezzo è ${price}`);
-
-              if (categorizedPayee) {
-                await postTransaction(isCC, price, categorizedPayee);
-              }
-            }
+            await checkIntesa(headers, body);
+            await checkAmex(headers, body);
           });
         });
         f.once('error', function (err) {
