@@ -1,5 +1,4 @@
 import Imap from 'imap';
-import imap from '../core/imap.js';
 import categorize from '../utils/payeeHandler.js';
 import postTransaction from './ynab.js';
 
@@ -73,14 +72,15 @@ async function checkAmex(headers, body) {
   }
 }
 
-function openInbox(cb) {
+function openInbox(imap, cb) {
   imap.openBox(process.env.INBOX, true, cb);
 }
-const runImap = () => {
+
+const runImap = (imap) => {
   console.log('Ready to receive emails!!!');
 
   imap.once('ready', function () {
-    openInbox(function (err, box) {
+    openInbox(imap, function (err, box) {
       if (err) throw err;
 
       imap.on('mail', function (msg) {
@@ -114,10 +114,13 @@ const runImap = () => {
           });
 
           msg.once('end', async function () {
-            console.log(headers);
+            const isAmexImap = imap._config.user === 'alishadman69@gmail.com';
 
-            await checkIntesa(headers, body);
-            await checkAmex(headers, body);
+            if (isAmexImap) {
+              await checkAmex(headers, body);
+            } else {
+              await checkIntesa(headers, body);
+            }
           });
         });
         f.once('error', function (err) {
