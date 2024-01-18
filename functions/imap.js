@@ -58,9 +58,6 @@ async function checkAmex(headers, body) {
 
   const match = body.match(regex);
 
-  console.log('body', body);
-  console.log('match', match);
-
   if (match) {
     const operationDetails = match[1].trim();
     const importNumber = match[2];
