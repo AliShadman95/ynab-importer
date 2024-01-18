@@ -116,6 +116,9 @@ const runImap = (imap) => {
           msg.once('end', async function () {
             const isAmexImap = imap._config.user === 'alishadman69@gmail.com';
 
+            console.log('Headers: ', headers);
+            console.log('Body: ', body);
+
             if (isAmexImap) {
               await checkAmex(headers, body);
             } else {
