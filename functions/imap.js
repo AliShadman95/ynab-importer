@@ -4,7 +4,6 @@ import categorize from '../utils/payeeHandler.js';
 import postTransaction from './ynab.js';
 import * as cheerio from 'cheerio';
 import qp from 'quoted-printable';
-import mailparser from 'mailparser';
 
 async function checkIntesa(headers, body) {
   const fromMail = process.env.FROM_MAIL;

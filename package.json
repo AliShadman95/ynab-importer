@@ -22,10 +22,12 @@
   "homepage": "https://github.com/AliShadman95/ynab-importer#readme",
   "dependencies": {
     "babel-eslint": "^10.1.0",
+    "cheerio": "^1.0.0-rc.12",
     "dotenv": "^16.0.3",
     "imap": "^0.8.19",
     "nodemon": "^2.0.20",
     "pm2": "^5.2.2",
+    "quoted-printable": "^1.0.1",
     "ynab": "^1.45.0"
   },
   "devDependencies": {
