@@ -18,18 +18,30 @@ async function checkIntesa(headers, body) {
   }
 
   console.log(`Trovata una mail con il mittente: ${headers?.from[0]}`);
-  const isCC = body.includes(ccValue);
+  const isCC = ccValue && body.includes(ccValue);
 
-  const price = body
-    .split(isCC ? ' EUR' : ' con la')[0]
-    .split(' ')
-    [body.split(isCC ? ' EUR' : ' con la')[0].split(' ').length - 1].replace(
-      '=',
-      '',
-    )
-    .replace(/\s/g, '');
+  let price = '';
 
-  const payee = body.split('presso')[1].split('.')[0];
+  if (isCC) {
+    const firstBodyPart = body.split(' EUR')[0].split(' ');
+
+    price = firstBodyPart[firstBodyPart.length - 1]
+      .replace('=', '')
+      .replace(/\s/g, '');
+  } else {
+    const firstBodyPart = body.split(' con la')[0].split(' ');
+
+    price =
+      firstBodyPart[firstBodyPart.length - 1] === 'euro' ||
+      firstBodyPart[firstBodyPart.length - 1] === 'EUR'
+        ? firstBodyPart[firstBodyPart.length - 2]
+        : firstBodyPart[firstBodyPart.length - 1]
+            .replace('=', '')
+            .replace(/\s/g, '')
+            .replace('euro', 'EUR');
+  }
+
+  const payee = body.split('presso')[1].split('Cordiali saluti')[0];
   const categorizedPayee = categorize(payee);
 
   console.log(`Email con pagamento ricevuto, il prezzo è ${price}`);
@@ -844,7 +856,9 @@ const runImap = () => {
 
           msg.once('end', async function () {
             await checkIntesa(headers, body);
-            await checkAmex(headers, body);
+            if (process.env.AMEX_ENABLED === 'true') {
+              await checkAmex(headers, body);
+            }
           });
         });
         f.once('error', function (err) {

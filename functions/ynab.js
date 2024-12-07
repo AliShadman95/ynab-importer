@@ -3,25 +3,43 @@ import ynab, { utils } from 'ynab';
 const ynabAPI = new ynab.API(process.env.YNAB_TOKEN);
 
 const postTransaction = async (account, price, categorizedPayee) => {
+  const isMartina = process.env.ENV_TYPE === 'marti';
+
+  const {
+    data: { budgets },
+  } = await ynabAPI.budgets.getBudgets();
+
+  const budgetId = budgets.find((budget) =>
+    budget?.name?.toLowerCase()?.includes(isMartina ? 'martina' : 'ali'),
+  )?.id;
+
   const {
     data: { accounts },
-  } = await ynabAPI.accounts.getAccounts('last-used');
+  } = await ynabAPI.accounts.getAccounts(budgetId);
 
   const {
     data: { category_groups },
-  } = await ynabAPI.categories.getCategories('last-used');
+  } = await ynabAPI.categories.getCategories(budgetId);
 
-  const correctCategory = category_groups.find((cg) =>
-    cg.categories.some((c) =>
-      c.name.toLowerCase().includes(categorizedPayee.category),
-    ),
-  );
+  const correctCategoryGroup =
+    category_groups.find((cg) =>
+      cg.categories.some((c) =>
+        c.name.toLowerCase().includes(categorizedPayee.category),
+      ),
+    ) ||
+    category_groups.find((cg) =>
+      cg.categories.some((c) =>
+        c.name.toLowerCase().includes('spese generiche'),
+      ),
+    );
 
   const getTransactionInfo = (account) => {
     switch (account) {
       case 'intesa':
         return {
-          price: Math.ceil(parseFloat(price.replace(/,/g, '.'))) * 1000,
+          price: isMartina
+            ? parseFloat(price.replace(/,/g, '.')) * 1000
+            : Math.ceil(parseFloat(price.replace(/,/g, '.'))) * 1000,
           account_id: accounts.find((account) =>
             account.name?.toLowerCase().includes('intesa'),
           ).id,
@@ -50,19 +68,31 @@ const postTransaction = async (account, price, categorizedPayee) => {
 
   const transactionInfo = getTransactionInfo(account);
 
-  await ynabAPI.transactions.createTransaction('last-used', {
-    transaction: {
-      amount: -Math.abs(transactionInfo?.price),
-      payee_name: categorizedPayee.payee_name,
-      category_id: correctCategory.categories.find((c) =>
-        c.name.toLowerCase().includes(categorizedPayee.category),
-      ).id,
-      approved: false,
-      flag_color: 'green',
-      account_id: transactionInfo?.account_id,
-      date: utils.getCurrentDateInISOFormat(),
-    },
-  });
+  try {
+    await ynabAPI.transactions.createTransaction(budgetId, {
+      transaction: {
+        amount: -Math.abs(transactionInfo?.price),
+        payee_name: categorizedPayee.payee_name?.trimEnd(),
+        category_id:
+          correctCategoryGroup?.categories?.find((c) =>
+            c.name.toLowerCase().includes(categorizedPayee.category),
+          )?.id ||
+          correctCategoryGroup?.categories?.find((c) =>
+            c.name.toLowerCase().includes('spese generiche'),
+          )?.id,
+        approved: false,
+        flag_color: 'green',
+        account_id: transactionInfo?.account_id,
+        date: utils.getCurrentDateInISOFormat(),
+      },
+    });
+
+    console.log(
+      `Successfully added transaction for ${account} with price ${price} and payee ${categorizedPayee.payee_name}`,
+    );
+  } catch (error) {
+    console.error('Error while trying to post on YNAB', error);
+  }
 };
 
 export { postTransaction };

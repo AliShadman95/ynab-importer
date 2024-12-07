@@ -1,7 +1,7 @@
 import Imap from 'imap';
 
 const imap = new Imap({
-  user: 'alishadman955@gmail.com',
+  user: process.env.GMAIL_MAIL,
   password: process.env.GMAIL_TOKEN,
   host: 'imap.gmail.com',
   port: 993,

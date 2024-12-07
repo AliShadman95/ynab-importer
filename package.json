@@ -6,9 +6,12 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start-pm2": "pm2 start .pm2-process.json",
-    "stop-pm2": "pm2 stop .pm2-process.json",
-    "dev": "nodemon index.js"
+    "start-pm2": "pm2 start .pm2-process.json --only ynab-prod-default",
+    "start-pm2-marti": "pm2 start .pm2-process.json --only ynab-prod-marti",
+    "stop-pm2": "pm2 stop ynab-prod-default",
+    "stop-pm2-marti": "pm2 stop ynab-prod-marti",
+    "dev": "cross-env ENV_TYPE=default nodemon index.js",
+    "dev:marti": "cross-env ENV_TYPE=marti nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -31,6 +34,7 @@
     "ynab": "^1.45.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "eslint": "^8.32.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.27.5",
