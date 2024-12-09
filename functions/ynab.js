@@ -1,4 +1,5 @@
 import ynab, { utils } from 'ynab';
+import { logWithTimestamp } from '../utils/logger.js';
 
 const ynabAPI = new ynab.API(process.env.YNAB_TOKEN);
 
@@ -87,11 +88,11 @@ const postTransaction = async (account, price, categorizedPayee) => {
       },
     });
 
-    console.log(
+    logWithTimestamp(
       `Successfully added transaction for ${account} with price ${price} and payee ${categorizedPayee.payee_name}`,
     );
   } catch (error) {
-    console.error('Error while trying to post on YNAB', error);
+    logWithTimestamp('Error while trying to post on YNAB', error);
   }
 };
 
