@@ -11,13 +11,11 @@ const postTransaction = async (account, price, categorizedPayee) => {
     password: process.env.ACTUAL_PASS,
   });
 
-  const syncId = isMartina
-    ? '5a0116b1-f3ff-4274-bbb4-5e1f96a1bb6b'
-    : 'ddf1da68-b340-4e93-a94f-6a3831f5d9a6';
-
-  await api.downloadBudget(syncId, {
-    password: process.env.ACTUAL_E2E,
-  });
+  isMartina
+    ? await api.downloadBudget('5a0116b1-f3ff-4274-bbb4-5e1f96a1bb6b')
+    : await api.downloadBudget('ddf1da68-b340-4e93-a94f-6a3831f5d9a6', {
+        password: process.env.ACTUAL_PASS,
+      });
 
   const categories = await api.getCategories();
   const accounts = await api.getAccounts();
