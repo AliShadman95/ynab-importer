@@ -8,6 +8,7 @@
       "max_memory_restart": "1024M",
       "instances": 1,
       "exec_mode": "fork",
+      "interpreter": "/home/ubuntu/.nvm/versions/node/v18.20.5/bin/node",
       "error_file": "./logs/errors_pm2.log",
       "out_file": "./logs/debug_pm2.log",
       "ignore_watch": [
@@ -33,6 +34,7 @@
       "max_memory_restart": "1024M",
       "instances": 1,
       "exec_mode": "fork",
+      "interpreter": "/home/ubuntu/.nvm/versions/node/v18.20.5/bin/node",
       "error_file": "./logs/errors_pm2.log",
       "out_file": "./logs/debug_pm2.log",
       "ignore_watch": [
