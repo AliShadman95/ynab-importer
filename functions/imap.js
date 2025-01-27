@@ -77,8 +77,6 @@ async function checkAmex(headers, body) {
 
   logWithTimestamp(`Trovata una mail con il mittente: ${headers?.from[0]}`);
 
-  logWithTimestamp('originalBody', body);
-
   const $ = cheerio.load(body);
 
   // Extract the body content
@@ -88,7 +86,7 @@ async function checkAmex(headers, body) {
 
   const finalBody = decodedBody
     .replace(
-      'Informazioni importanti sul tuo accountTITOLAREUltime   6 cifre della Carta: 221006Conferma OperazioneTi confermiamo che Ã¨ stata eseguita su Carta di Credi  to Oro American ExpressÂ® una operazione superiore allâimporto   di 1,00 EUR da te impostato per la notifica.Â Dettagli operazione:',
+      'Informazioni importanti sul tuo accountTITOLAREUltime   6 cifre della Carta: 222004Conferma OperazioneTi confermiamo che Ã¨ stata eseguita su Carta di Credi  to Oro American ExpressÂ® una operazione superiore allâimporto   di 1,00 EUR da te impostato per la notifica.Â Dettagli operazione:',
       '',
     )
     .replace(

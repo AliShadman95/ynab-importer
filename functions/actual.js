@@ -14,7 +14,7 @@ const postTransaction = async (account, price, categorizedPayee) => {
   isMartina
     ? await api.downloadBudget('5a0116b1-f3ff-4274-bbb4-5e1f96a1bb6b')
     : await api.downloadBudget('ddf1da68-b340-4e93-a94f-6a3831f5d9a6', {
-        password: process.env.ACTUAL_PASS,
+        password: process.env.ACTUAL_E2E,
       });
 
   const categories = await api.getCategories();
@@ -34,7 +34,7 @@ const postTransaction = async (account, price, categorizedPayee) => {
 
       case 'amex':
         return {
-          price: parseFloat(price.replace(/,/g, '.')) * 100,
+          price: Math.round(parseFloat(price.replace(/,/g, '.')) * 100),
           account_id: accounts.find((account) =>
             account.name?.toLowerCase().includes('amex'),
           ).id,
@@ -55,6 +55,8 @@ const postTransaction = async (account, price, categorizedPayee) => {
 
   const transactionInfo = getTransactionInfo(account);
 
+  console.log(transactionInfo.price);
+
   try {
     await api.addTransactions(
       transactionInfo.account_id,
@@ -66,6 +68,7 @@ const postTransaction = async (account, price, categorizedPayee) => {
           category: categories.find((c) =>
             c.name.toLowerCase().includes(categorizedPayee.category),
           )?.id,
+          cleared: false,
         },
       ],
       { learnCategories: true },
