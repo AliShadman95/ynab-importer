@@ -1,7 +1,7 @@
 import Imap from 'imap';
 import imap from '../core/imap.js';
 import categorize from '../utils/payeeHandler.js';
-import { postTransaction as postTransactionActual } from './actual.js';
+/* import { postTransaction as postTransactionActual } from './actual.js'; */
 import postTransaction from './ynab.js';
 import * as cheerio from 'cheerio';
 import qp from 'quoted-printable';
@@ -54,11 +54,11 @@ async function checkIntesa(headers, body) {
       categorizedPayee,
     );
 
-    await postTransactionActual(
+    /* await postTransactionActual(
       isCC ? 'mastercard' : 'intesa',
       price,
       categorizedPayee,
-    );
+    ); */
   } else {
     logWithTimestamp('Prezzo non trovato.');
   }
@@ -109,7 +109,7 @@ async function checkAmex(headers, body) {
     if (categorizedPayee) {
       await postTransaction('amex', amount, categorizedPayee);
 
-      await postTransactionActual('amex', amount, categorizedPayee);
+      /*  await postTransactionActual('amex', amount, categorizedPayee); */
     }
   } else {
     logWithTimestamp('Match not found in the text.');
