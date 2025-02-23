@@ -54,6 +54,14 @@ const postTransaction = async (account, price, categorizedPayee) => {
           ).id,
         };
 
+      case 'amex-plat':
+        return {
+          price: parseFloat(price.replace(/,/g, '.')) * 1000,
+          account_id: accounts.find((account) =>
+            account.name?.toLowerCase().includes('amex platino'),
+          ).id,
+        };
+
       case 'mastercard':
         return {
           price: parseFloat(price.replace(/,/g, '.')) * 1000,

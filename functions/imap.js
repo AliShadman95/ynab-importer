@@ -84,11 +84,9 @@ async function checkAmex(headers, body) {
 
   const decodedBody = qp.decode(cheerioedBody);
 
+  const isPlatinum = decodedBody.includes('Carta Platino');
+
   const finalBody = decodedBody
-    .replace(
-      'Informazioni importanti sul tuo accountTITOLAREUltime   6 cifre della Carta: 222004Conferma OperazioneTi confermiamo che Ã¨ stata eseguita su Carta di Credi  to Oro American ExpressÂ® una operazione superiore allâimporto   di 1,00 EUR da te impostato per la notifica.Â Dettagli operazione:',
-      '',
-    )
     .replace(
       'EURAttenzione: Questa mail Ã¨ una co  municazione di servizio e non una comunicazione contenente offerte promozio  nali. Non utilizzare lÂ´indirizzo di posta elettronica con cui Ã¨ s  tato inviato il presente email per richiedere informazioni o formulare ques  iti. Non verrÃ  dato alcun seguito alle email ricevute che saranno imme  diatamente cancellate.Dichiarazione sulla privacy. Clicca qui per maggiori dettagli   sulle pratiche relative alle comunicazioni via e-mail, e per consultare la   Dichiarazione sulla privacy di American Express.Â Questa email Ã¨ stata in  viata a alishadman955@gmail.comÂ Â©2024 American Express Company. All righ  ts reserved.INTUNALE0020007SAM0FYI023',
       '',
@@ -100,14 +98,17 @@ async function checkAmex(headers, body) {
   const match = finalBody.match(pattern);
 
   if (match) {
-    var date = match[1];
     var payee = match[2];
     var amount = match[3];
 
     const categorizedPayee = categorize(payee);
 
     if (categorizedPayee) {
-      await postTransaction('amex', amount, categorizedPayee);
+      await postTransaction(
+        isPlatinum ? 'amex-plat' : 'amex',
+        amount,
+        categorizedPayee,
+      );
 
       /*  await postTransactionActual('amex', amount, categorizedPayee); */
     }
